@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"strings"
 )
 
 type Arguments struct {
@@ -83,13 +84,20 @@ func DoConnect(args Arguments) error {
 	defer conn.Close()
 
 	go func() {
-		io.Copy(os.Stdout, os.Stdin)
-		panic("Cannot copy from Stdin into Stdout")
-	}()
+		for {
+			// buf := make([]byte, 1024)
+			// n, err := os.Stdin.Read(buf)
+			var str string
+			_, err := fmt.Scanln(&str)
+			if err != nil {
+				panic(err)
+			}
+			// os.Stdout.Write(buf)
+			println(str)
 
-	go func() {
-		io.Copy(conn, os.Stdin)
-		panic("Cannot copy from Stdin into Conn")
+			str = strings.TrimRight(str, "\r\n")
+			conn.Write([]byte(str))
+		}
 	}()
 
 	go func() {
