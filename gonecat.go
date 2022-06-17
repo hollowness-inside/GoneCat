@@ -5,12 +5,16 @@ import (
 	"io"
 	"net"
 	"os"
+	"regexp"
 )
 
 type GoneCat struct {
+	AddrStr   string
+	AddrPort  string
+	Address   string
 	Listening bool
-	Ipv4      bool
-	Ipv6      bool
+	OnlyIpv4  bool
+	OnlyIpv6  bool
 	Tcp       bool
 	SendCRLF  bool
 	ReadStdin bool
@@ -19,27 +23,21 @@ type GoneCat struct {
 
 func (gc *GoneCat) UseDefaults() {
 	gc.Listening = false
-	gc.Ipv4 = true
-	gc.Ipv6 = false
+	gc.OnlyIpv4 = false
+	gc.OnlyIpv6 = false
 	gc.Tcp = true
 	gc.SendCRLF = false
 	gc.ReadStdin = true
-	gc.Addr = net.TCPAddr{}
-}
-
-func (gc *GoneCat) Network() string {
-	if gc.Tcp {
-		return "tcp"
-	} else {
-		return "udp"
-	}
-}
-
-func (gc *GoneCat) Address() string {
-	return gc.Addr.String()
 }
 
 func (gc *GoneCat) Execute() error {
+	ipv4, _ := regexp.MatchString(`(?:[0-9]{1,3}\.){3}[0-9]{1,3}`, gc.AddrStr)
+	if ipv4 {
+		gc.Address = gc.AddrStr + ":" + gc.AddrPort
+	} else {
+		gc.Address = "[" + gc.AddrStr + "]:" + gc.AddrPort
+	}
+
 	if gc.Listening {
 		return gc.doListen()
 	} else {
@@ -47,8 +45,29 @@ func (gc *GoneCat) Execute() error {
 	}
 }
 
+func (gc *GoneCat) Network() string {
+	var only string = ""
+
+	if gc.OnlyIpv4 {
+		only = "4"
+	}
+
+	if gc.OnlyIpv6 {
+		only = "6"
+	}
+
+	var protocol string
+	if gc.Tcp {
+		protocol = "tcp"
+	} else {
+		protocol = "udp"
+	}
+
+	return protocol + only
+}
+
 func (gc *GoneCat) doListen() error {
-	listener, err := net.Listen(gc.Network(), gc.Address())
+	listener, err := net.Listen(gc.Network(), gc.Address)
 	if err != nil {
 		return err
 	}
@@ -61,7 +80,7 @@ func (gc *GoneCat) doListen() error {
 }
 
 func (gc *GoneCat) doConnect() error {
-	conn, err := net.Dial(gc.Network(), gc.Address())
+	conn, err := net.Dial(gc.Network(), gc.Address)
 	if err != nil {
 		return err
 	}

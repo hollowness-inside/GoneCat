@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net"
 	"os"
 )
 
@@ -26,9 +25,9 @@ func main() {
 		cur := os.Args[arg]
 		switch cur {
 		case "-4":
-			gct.Ipv4 = true
+			gct.OnlyIpv4 = true
 		case "-6":
-			gct.Ipv6 = true
+			gct.OnlyIpv6 = true
 		case "-u":
 			gct.Tcp = false
 		case "-C":
@@ -41,12 +40,9 @@ func main() {
 			help()
 			return
 		default:
-			addr, err := net.ResolveTCPAddr("", cur)
-			if err != nil {
-				help()
-				return
-			}
-			gct.Addr = *addr
+			gct.AddrStr = cur
+			gct.AddrPort = os.Args[arg+1]
+			arg += 1
 		}
 
 		arg++
