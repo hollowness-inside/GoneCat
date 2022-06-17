@@ -5,9 +5,8 @@ NetCat implementation in go
 > gnc [options] host port
 
 Options:
-* -u - Use UDP connection
-* -t - Use TCP connection (Default)
+* -4 - Use IPv4
+* -6 - Use IPv6
 * -C - Send CRLF as line-ending
-* -d - Do not attempt to read from stdin
-* -4 - Use only IPv4 Protocol
-* -6 - Use only Ipv6 Protocol
+* -d - Detach from stdin
+* -u - UDP mode
