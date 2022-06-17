@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"os"
 	"strings"
@@ -84,9 +85,8 @@ func DoListen(args Arguments) error {
 		if err != nil {
 			panic(err)
 		}
-		defer conn.Close()
 
-		go io.Copy(os.Stdout, conn)
+		go handleConnection(conn)
 	}
 }
 
@@ -102,6 +102,12 @@ func DoConnect(args Arguments) error {
 	if err != nil {
 		return err
 	}
+
+	go handleConnection(conn)
+	return nil
+}
+
+func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
 	go func() {
@@ -118,8 +124,11 @@ func DoConnect(args Arguments) error {
 	}()
 
 	go func() {
-		io.Copy(os.Stdout, conn)
-		panic("Cannot copy from Conn into Stdout")
+		_, err := io.Copy(os.Stdout, conn)
+		if err != nil {
+			log.Fatalf("Cannot copy from Conn into Stdout. Conn: %s", conn.RemoteAddr().String())
+		}
+		// fmt.Printf("%s has been disconnected\n", conn.RemoteAddr().String())
 	}()
 
 	for {
