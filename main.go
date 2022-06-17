@@ -14,15 +14,33 @@ type Arguments struct {
 	Ipv4      bool
 	Ipv6      bool
 	Tcp       bool
-	Address   net.TCPAddr
+	Addr      net.TCPAddr
+}
+
+func (a Arguments) Default() Arguments {
+	a.Listening = false
+	a.Ipv4 = true
+	a.Ipv6 = false
+	a.Tcp = true
+	a.Addr = net.TCPAddr{}
+
+	return a
+}
+
+func (a *Arguments) Network() string {
+	if a.Tcp {
+		return "tcp"
+	} else {
+		return "udp"
+	}
+}
+
+func (a *Arguments) Address() string {
+	return a.Addr.String()
 }
 
 func main() {
-	args := Arguments{}
-	args.Listening = false
-	args.Ipv4 = true
-	args.Ipv6 = false
-	args.Tcp = true
+	args := Arguments{}.Default()
 	arg := 1
 
 	for arg < len(os.Args) {
@@ -42,7 +60,7 @@ func main() {
 				help()
 				return
 			}
-			args.Address = *addr
+			args.Addr = *addr
 		}
 
 		arg++
@@ -67,14 +85,7 @@ func Execute(args Arguments) error {
 }
 
 func doListen(args Arguments) error {
-	var network string
-	if args.Tcp {
-		network = "tcp"
-	} else {
-		network = "udp"
-	}
-
-	listener, err := net.Listen(network, args.Address.String())
+	listener, err := net.Listen(args.Network(), args.Address())
 	if err != nil {
 		return err
 	}
@@ -91,19 +102,12 @@ func doListen(args Arguments) error {
 }
 
 func doConnect(args Arguments) error {
-	var network string
-	if args.Tcp {
-		network = "tcp"
-	} else {
-		network = "udp"
-	}
-
-	conn, err := net.Dial(network, args.Address.String())
+	conn, err := net.Dial(args.Network(), args.Address())
 	if err != nil {
 		return err
 	}
 
-	go handleConnection(conn)
+	handleConnection(conn)
 	return nil
 }
 
@@ -113,11 +117,7 @@ func handleConnection(conn net.Conn) {
 	go func() {
 		for {
 			var str string
-			_, err := fmt.Scanln(&str)
-			if err != nil {
-				panic(err)
-			}
-
+			fmt.Scanln(&str)
 			str = strings.TrimRight(str, "\r\n")
 			conn.Write([]byte(str))
 		}
