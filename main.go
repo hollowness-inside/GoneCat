@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"os"
 	"strings"
@@ -92,11 +92,7 @@ func doListen(args Arguments) error {
 	defer listener.Close()
 
 	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			panic(err)
-		}
-
+		conn, _ := listener.Accept()
 		go handleConnection(conn)
 	}
 }
@@ -114,22 +110,17 @@ func doConnect(args Arguments) error {
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
+	scanner := bufio.NewScanner(os.Stdin)
+
 	go func() {
 		for {
-			var str string
-			fmt.Scanln(&str)
+			str := scanner.Text()
 			str = strings.TrimRight(str, "\r\n")
 			conn.Write([]byte(str))
 		}
 	}()
 
-	go func() {
-		_, err := io.Copy(os.Stdout, conn)
-		if err != nil {
-			log.Fatalf("Cannot copy from Conn into Stdout. Conn: %s", conn.RemoteAddr().String())
-		}
-		// fmt.Printf("%s has been disconnected\n", conn.RemoteAddr().String())
-	}()
+	go io.Copy(os.Stdout, conn)
 
 	for {
 	}
