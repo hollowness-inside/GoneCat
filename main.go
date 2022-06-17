@@ -11,13 +11,14 @@ func help() {
 	println("\t-u - Use UDP connection")
 	println("\t-t - Use TCP connection (Default)")
 	println("\t-C - Send CRLF as line-ending (Default is none)")
+	println("\t-d - Do not attempt to read from stdin")
 	println("\t-4 - Use only IPv4")
 	println("\t-6 - Use only IPv6")
 }
 
 func main() {
-	args := GoneCat{}
-	args.UseDefaults()
+	gct := GoneCat{}
+	gct.UseDefaults()
 
 	arg := 1
 
@@ -25,15 +26,17 @@ func main() {
 		cur := os.Args[arg]
 		switch cur {
 		case "-4":
-			args.Ipv4 = true
+			gct.Ipv4 = true
 		case "-6":
-			args.Ipv6 = true
+			gct.Ipv6 = true
 		case "-u":
-			args.Tcp = false
+			gct.Tcp = false
 		case "-C":
-			args.SendCRLF = true
+			gct.SendCRLF = true
 		case "-l":
-			args.Listening = true
+			gct.Listening = true
+		case "-d":
+			gct.ReadStdin = false
 		case "-h", "--help":
 			help()
 			return
@@ -43,13 +46,13 @@ func main() {
 				help()
 				return
 			}
-			args.Addr = *addr
+			gct.Addr = *addr
 		}
 
 		arg++
 	}
 
-	err := args.Execute()
+	err := gct.Execute()
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 	}

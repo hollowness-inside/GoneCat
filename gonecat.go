@@ -13,6 +13,7 @@ type GoneCat struct {
 	Ipv6      bool
 	Tcp       bool
 	SendCRLF  bool
+	ReadStdin bool
 	Addr      net.TCPAddr
 }
 
@@ -22,6 +23,7 @@ func (gc *GoneCat) UseDefaults() {
 	gc.Ipv6 = false
 	gc.Tcp = true
 	gc.SendCRLF = false
+	gc.ReadStdin = true
 	gc.Addr = net.TCPAddr{}
 }
 
@@ -71,19 +73,22 @@ func (gc *GoneCat) doConnect() error {
 func (gc *GoneCat) handleConnection(conn net.Conn) {
 	defer conn.Close()
 
-	scanner := bufio.NewScanner(os.Stdin)
+	if gc.ReadStdin {
+		scanner := bufio.NewScanner(os.Stdin)
 
-	go func() {
-		for scanner.Scan() {
-			str := scanner.Text()
+		go func() {
+			for scanner.Scan() {
+				str := scanner.Text()
 
-			if gc.SendCRLF {
-				str += "\r\n"
+				if gc.SendCRLF {
+					str += "\r\n"
+				}
+
+				conn.Write([]byte(str))
 			}
-
-			conn.Write([]byte(str))
-		}
-	}()
+		}()
+	}
 
 	io.Copy(os.Stdout, conn)
+
 }
