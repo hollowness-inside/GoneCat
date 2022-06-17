@@ -1,3 +1,3 @@
-module joshua/green/netcat
+module joshua/green/gonecat
 
 go 1.18
