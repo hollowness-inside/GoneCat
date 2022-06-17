@@ -2,7 +2,7 @@
 NetCat implementation in go
 
 # Usage
-> gct [options] host:port
+> gnc [options] host:port
 
 Options:
 * -u - Use UDP connection
