@@ -7,13 +7,13 @@ import (
 )
 
 func help() {
-	println("Use: gnc [options] address:port")
-	println("\t-u - Use UDP connection")
-	println("\t-t - Use TCP connection (Default)")
-	println("\t-C - Send CRLF as line-ending (Default is none)")
-	println("\t-d - Do not attempt to read from stdin")
-	println("\t-4 - Use only IPv4")
-	println("\t-6 - Use only IPv6")
+	fmt.Println("Use: gnc [options] address:port")
+	fmt.Println("\t-u - Use UDP connection")
+	fmt.Println("\t-t - Use TCP connection (Default)")
+	fmt.Println("\t-C - Send CRLF as line-ending (Default is none)")
+	fmt.Println("\t-d - Do not attempt to read from stdin")
+	fmt.Println("\t-4 - Use only IPv4")
+	fmt.Println("\t-6 - Use only IPv6")
 }
 
 func main() {
