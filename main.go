@@ -6,10 +6,10 @@ import (
 )
 
 func help() {
-	fmt.Println("Use: gnc [options] address:port")
+	fmt.Println("Use: gnc [options] address port")
 	fmt.Println("\t-u - Use UDP connection")
 	fmt.Println("\t-t - Use TCP connection (Default)")
-	fmt.Println("\t-C - Send CRLF as line-ending (Default is none)")
+	fmt.Println("\t-C - Send CRLF as line-ending")
 	fmt.Println("\t-d - Do not attempt to read from stdin")
 	fmt.Println("\t-4 - Use only IPv4")
 	fmt.Println("\t-6 - Use only IPv6")
@@ -30,6 +30,8 @@ func main() {
 			gct.OnlyIpv6 = true
 		case "-u":
 			gct.Tcp = false
+		case "-t":
+			gct.Tcp = true
 		case "-C":
 			gct.SendCRLF = true
 		case "-l":
