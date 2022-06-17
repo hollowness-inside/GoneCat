@@ -66,7 +66,28 @@ func execute(args Arguments) error {
 }
 
 func DoListen(args Arguments) error {
-	return nil
+	var network string
+	if args.Tcp {
+		network = "tcp"
+	} else {
+		network = "udp"
+	}
+
+	listener, err := net.Listen(network, args.Address.String())
+	if err != nil {
+		return err
+	}
+	defer listener.Close()
+
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			panic(err)
+		}
+		defer conn.Close()
+
+		go io.Copy(os.Stdout, conn)
+	}
 }
 
 func DoConnect(args Arguments) error {
@@ -85,15 +106,11 @@ func DoConnect(args Arguments) error {
 
 	go func() {
 		for {
-			// buf := make([]byte, 1024)
-			// n, err := os.Stdin.Read(buf)
 			var str string
 			_, err := fmt.Scanln(&str)
 			if err != nil {
 				panic(err)
 			}
-			// os.Stdout.Write(buf)
-			println(str)
 
 			str = strings.TrimRight(str, "\r\n")
 			conn.Write([]byte(str))
