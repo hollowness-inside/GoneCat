@@ -113,7 +113,7 @@ func handleConnection(conn net.Conn) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	go func() {
-		for {
+		for scanner.Scan() {
 			str := scanner.Text()
 			str = strings.TrimRight(str, "\r\n")
 			conn.Write([]byte(str))
