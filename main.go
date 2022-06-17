@@ -48,7 +48,7 @@ func main() {
 		arg++
 	}
 
-	err := execute(args)
+	err := Execute(args)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 	}
@@ -58,15 +58,15 @@ func help() {
 	println("Use: nc [-46ul] address:port")
 }
 
-func execute(args Arguments) error {
+func Execute(args Arguments) error {
 	if args.Listening {
-		return DoListen(args)
+		return doListen(args)
 	} else {
-		return DoConnect(args)
+		return doConnect(args)
 	}
 }
 
-func DoListen(args Arguments) error {
+func doListen(args Arguments) error {
 	var network string
 	if args.Tcp {
 		network = "tcp"
@@ -90,7 +90,7 @@ func DoListen(args Arguments) error {
 	}
 }
 
-func DoConnect(args Arguments) error {
+func doConnect(args Arguments) error {
 	var network string
 	if args.Tcp {
 		network = "tcp"
