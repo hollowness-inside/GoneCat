@@ -52,7 +52,7 @@ func (gc *GoneCat) resolveAddress() {
 }
 
 func (gc *GoneCat) resolveNetwork() {
-	var only string = ""
+	only := ""
 
 	if gc.OnlyIpv4 {
 		only = "4"
