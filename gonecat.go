@@ -5,7 +5,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"strings"
 )
 
 type GoneCat struct {
@@ -13,6 +12,7 @@ type GoneCat struct {
 	Ipv4      bool
 	Ipv6      bool
 	Tcp       bool
+	SendCRLF  bool
 	Addr      net.TCPAddr
 }
 
@@ -21,6 +21,7 @@ func (gc *GoneCat) UseDefaults() {
 	gc.Ipv4 = true
 	gc.Ipv6 = false
 	gc.Tcp = true
+	gc.SendCRLF = false
 	gc.Addr = net.TCPAddr{}
 }
 
@@ -53,7 +54,7 @@ func (gc *GoneCat) doListen() error {
 
 	for {
 		conn, _ := listener.Accept()
-		go handleConnection(conn)
+		go gc.handleConnection(conn)
 	}
 }
 
@@ -63,11 +64,11 @@ func (gc *GoneCat) doConnect() error {
 		return err
 	}
 
-	handleConnection(conn)
+	gc.handleConnection(conn)
 	return nil
 }
 
-func handleConnection(conn net.Conn) {
+func (gc *GoneCat) handleConnection(conn net.Conn) {
 	defer conn.Close()
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -75,7 +76,11 @@ func handleConnection(conn net.Conn) {
 	go func() {
 		for scanner.Scan() {
 			str := scanner.Text()
-			str = strings.TrimRight(str, "\r\n")
+
+			if gc.SendCRLF {
+				str += "\r\n"
+			}
+
 			conn.Write([]byte(str))
 		}
 	}()
