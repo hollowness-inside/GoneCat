@@ -39,6 +39,11 @@ func main() {
 			help()
 			return
 		default:
+			if arg+1 >= len(os.Args) {
+				help()
+				return
+			}
+
 			gct.AddrStr = cur
 			gct.AddrPort = os.Args[arg+1]
 			arg += 1
