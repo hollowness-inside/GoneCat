@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"net"
 	"os"
@@ -19,6 +20,7 @@ type GoneCat struct {
 	Tcp       bool
 	SendCRLF  bool
 	ReadStdin bool
+	ReadPipe  bool
 	Addr      net.TCPAddr
 }
 
@@ -29,6 +31,7 @@ func (gc *GoneCat) UseDefaults() {
 	gc.Tcp = true
 	gc.SendCRLF = false
 	gc.ReadStdin = true
+	gc.ReadPipe = false
 }
 
 func (gc *GoneCat) Execute() error {
@@ -37,9 +40,9 @@ func (gc *GoneCat) Execute() error {
 
 	if gc.Listening {
 		return gc.doListen()
-	} else {
-		return gc.doConnect()
 	}
+
+	return gc.doConnect()
 }
 
 func (gc *GoneCat) resolveAddress() {
@@ -98,20 +101,38 @@ func (gc *GoneCat) doConnect() error {
 func (gc *GoneCat) handleConnection(conn net.Conn) {
 	defer conn.Close()
 
-	if gc.ReadStdin {
-		scanner := bufio.NewScanner(os.Stdin)
+	if gc.ReadPipe {
+		reader := bufio.NewReader(os.Stdin)
 
 		go func() {
-			for scanner.Scan() {
-				str := scanner.Text()
-
-				if gc.SendCRLF {
-					str += "\r\n"
+			var data []byte
+			for {
+				b, err := reader.ReadByte()
+				if err == io.EOF {
+					break
 				}
-
-				conn.Write([]byte(str))
+				data = append(data, b)
 			}
+
+			conn.Write(data)
+			data = nil
 		}()
+	} else {
+		if gc.ReadStdin {
+			scanner := bufio.NewScanner(os.Stdin)
+
+			go func() {
+				for scanner.Scan() {
+					str := scanner.Text()
+
+					if gc.SendCRLF {
+						fmt.Fprintln(conn, str)
+					} else {
+						conn.Write([]byte(str))
+					}
+				}
+			}()
+		}
 	}
 
 	io.Copy(os.Stdout, conn)

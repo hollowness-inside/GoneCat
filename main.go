@@ -18,6 +18,15 @@ func main() {
 	gct := GoneCat{}
 	gct.UseDefaults()
 
+	info, err := os.Stdin.Stat()
+	if err != nil {
+		panic(err)
+	}
+
+	if info.Mode()&os.ModeCharDevice != 0 || info.Size() <= 0 {
+		gct.ReadPipe = true
+	}
+
 	arg := 1
 
 	for arg < len(os.Args) {
@@ -52,7 +61,7 @@ func main() {
 		arg++
 	}
 
-	err := gct.Execute()
+	err = gct.Execute()
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 	}
