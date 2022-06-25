@@ -47,24 +47,17 @@ func (gc *GoneCat) Execute() error {
 }
 
 func (gc *GoneCat) resolveAddress() {
-	only := ""
+	version := ""
 
 	if gc.OnlyIpv4 {
-		only = "4"
+		version = "4"
 	}
 
 	if gc.OnlyIpv6 {
-		only = "6"
+		version = "6"
 	}
 
-	var protocol string
-	if gc.Tcp {
-		protocol = "tcp"
-	} else {
-		protocol = "udp"
-	}
-
-	gc.Network = protocol + only
+	gc.Network = "tcp" + version
 
 	ip := net.ParseIP(gc.AddrStr)
 	port, err := strconv.Atoi(gc.AddrPort)
