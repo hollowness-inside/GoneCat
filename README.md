@@ -1,5 +1,5 @@
 # GoneCat
-NetCat implementation in go
+Netcat Implementation In Go
 
 # Usage
 > gnc [options] host port
