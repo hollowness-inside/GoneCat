@@ -10,18 +10,19 @@ import (
 )
 
 type GoneCat struct {
-	AddrStr   string
-	AddrPort  string
-	Address   string
-	Network   string
-	Listening bool
-	OnlyIpv4  bool
-	OnlyIpv6  bool
-	Tcp       bool
-	SendCRLF  bool
-	ReadStdin bool
-	ReadPipe  bool
-	Addr      net.TCPAddr
+	AddrStr    string
+	AddrPort   string
+	Address    string
+	Network    string
+	Listening  bool
+	OnlyIpv4   bool
+	OnlyIpv6   bool
+	Tcp        bool
+	SendCRLF   bool
+	ReadStdin  bool
+	ReadPipe   bool
+	BufferSize int
+	Addr       net.TCPAddr
 }
 
 func (gc *GoneCat) UseDefaults() {
@@ -32,6 +33,7 @@ func (gc *GoneCat) UseDefaults() {
 	gc.SendCRLF = false
 	gc.ReadStdin = true
 	gc.ReadPipe = false
+	gc.BufferSize = 1024
 }
 
 func (gc *GoneCat) Execute() error {
@@ -83,7 +85,11 @@ func (gc *GoneCat) doListen() error {
 	defer listener.Close()
 
 	for {
-		conn, _ := listener.Accept()
+		conn, err := listener.Accept()
+		if err != nil {
+			return err
+		}
+
 		go gc.handleConnection(conn)
 	}
 }
@@ -102,37 +108,30 @@ func (gc *GoneCat) handleConnection(conn net.Conn) {
 	defer conn.Close()
 
 	if gc.ReadPipe {
-		reader := bufio.NewReader(os.Stdin)
-
-		go func() {
-			var data []byte
-			for {
-				b, err := reader.ReadByte()
-				if err == io.EOF {
-					break
-				}
-				data = append(data, b)
+		for {
+			_, err := io.CopyN(conn, os.Stdin, int64(gc.BufferSize))
+			if err == io.EOF {
+				break
+			} else if err != nil {
+				panic(err)
 			}
+		}
+	}
 
-			conn.Write(data)
-			data = nil
-		}()
-	} else {
-		if gc.ReadStdin {
+	if gc.ReadStdin {
+		go func() {
 			scanner := bufio.NewScanner(os.Stdin)
 
-			go func() {
-				for scanner.Scan() {
-					str := scanner.Text()
+			for scanner.Scan() {
+				str := scanner.Text()
 
-					if gc.SendCRLF {
-						fmt.Fprintln(conn, str)
-					} else {
-						conn.Write([]byte(str))
-					}
+				if gc.SendCRLF {
+					fmt.Fprintln(conn, str)
+				} else {
+					conn.Write([]byte(str))
 				}
-			}()
-		}
+			}
+		}()
 	}
 
 	io.Copy(os.Stdout, conn)
