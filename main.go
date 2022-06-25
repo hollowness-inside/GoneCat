@@ -34,9 +34,9 @@ func main() {
 		cur := os.Args[arg]
 		switch cur {
 		case "-4":
-			gct.IPVersion = 4
+			gct.IPVersion = "4"
 		case "-6":
-			gct.IPVersion = 6
+			gct.IPVersion = "6"
 		case "-C":
 			gct.SendCRLF = false
 		case "-u":

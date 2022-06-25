@@ -23,8 +23,8 @@ type GoneCatArguments struct {
 	AddrPort   string
 	Network    string
 	Listening  bool
-	IPVersion  uint8
 	Protocol   string
+	IPVersion  string
 	SendCRLF   bool
 	ReadStdin  bool
 	ReadPipe   bool
@@ -33,7 +33,7 @@ type GoneCatArguments struct {
 
 func (gc *GoneCatArguments) UseDefaults() {
 	gc.Listening = false
-	gc.IPVersion = 0
+	gc.IPVersion = ""
 	gc.Protocol = "tcp"
 	gc.SendCRLF = true
 	gc.ReadStdin = true
@@ -56,15 +56,7 @@ func GetCat(gc GoneCatArguments) GoneCat {
 }
 
 func (gc *GoneCatArguments) resolveAddress() net.Addr {
-	var version string = ""
-	switch gc.IPVersion {
-	case 4:
-		version = "4"
-	case 6:
-		version = "6"
-	}
-
-	gc.Network = gc.Protocol + version
+	gc.Network = gc.Protocol + gc.IPVersion
 
 	ip := net.ParseIP(gc.AddrStr)
 	port, err := strconv.Atoi(gc.AddrPort)
