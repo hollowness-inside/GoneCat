@@ -35,7 +35,7 @@ func (gc *GoneCatArguments) UseDefaults() {
 	gc.Listening = false
 	gc.IPVersion = 0
 	gc.Protocol = "tcp"
-	gc.SendCRLF = false
+	gc.SendCRLF = true
 	gc.ReadStdin = true
 	gc.ReadPipe = false
 	gc.BufferSize = 1024

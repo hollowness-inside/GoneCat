@@ -10,7 +10,7 @@ func help() {
 	fmt.Println("Use: gnc [options] address port")
 	fmt.Println("\t-4 - Use IPv4")
 	fmt.Println("\t-6 - Use IPv6")
-	fmt.Println("\t-C - Send CRLF as line-ending")
+	fmt.Println("\t-C - Do not send CRLF as line-ending")
 	fmt.Println("\t-d - Detach from stdin")
 	fmt.Println("\t-u - Use UDP")
 }
@@ -38,7 +38,7 @@ func main() {
 		case "-6":
 			gct.IPVersion = 6
 		case "-C":
-			gct.SendCRLF = true
+			gct.SendCRLF = false
 		case "-u":
 			gct.Protocol = "udp"
 		case "-l":
