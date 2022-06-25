@@ -15,8 +15,7 @@ type GoneCat struct {
 	Address    *net.TCPAddr
 	Network    string
 	Listening  bool
-	OnlyIpv4   bool
-	OnlyIpv6   bool
+	IPVersion  uint8
 	Tcp        bool
 	SendCRLF   bool
 	ReadStdin  bool
@@ -27,8 +26,7 @@ type GoneCat struct {
 
 func (gc *GoneCat) UseDefaults() {
 	gc.Listening = false
-	gc.OnlyIpv4 = false
-	gc.OnlyIpv6 = false
+	gc.IPVersion = 0
 	gc.Tcp = true
 	gc.SendCRLF = false
 	gc.ReadStdin = true
@@ -40,20 +38,20 @@ func (gc *GoneCat) Execute() error {
 	gc.resolveAddress()
 
 	if gc.Listening {
-		return gc.doListen()
+		if gc.Tcp {
+			return gc.tcpListen()
+		}
 	}
 
 	return gc.doConnect()
 }
 
 func (gc *GoneCat) resolveAddress() {
-	version := ""
-
-	if gc.OnlyIpv4 {
+	var version string = ""
+	switch gc.IPVersion {
+	case 4:
 		version = "4"
-	}
-
-	if gc.OnlyIpv6 {
+	case 6:
 		version = "6"
 	}
 
@@ -68,7 +66,7 @@ func (gc *GoneCat) resolveAddress() {
 	gc.Address = &net.TCPAddr{IP: ip, Port: port, Zone: ""}
 }
 
-func (gc *GoneCat) doListen() error {
+func (gc *GoneCat) tcpListen() error {
 	listener, err := net.Listen(gc.Network, gc.Address.String())
 	if err != nil {
 		return err

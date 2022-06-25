@@ -33,9 +33,9 @@ func main() {
 		cur := os.Args[arg]
 		switch cur {
 		case "-4":
-			gct.OnlyIpv4 = true
+			gct.IPVersion = 4
 		case "-6":
-			gct.OnlyIpv6 = true
+			gct.IPVersion = 6
 		case "-u":
 			gct.Tcp = false
 		case "-C":
