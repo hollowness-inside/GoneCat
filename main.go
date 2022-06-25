@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"joshua/green/gonecat/gonecat"
 	"os"
 )
 
@@ -14,7 +15,7 @@ func help() {
 }
 
 func main() {
-	gct := GoneCat{}
+	gct := gonecat.GoneCat{}
 	gct.UseDefaults()
 
 	info, err := os.Stdin.Stat()

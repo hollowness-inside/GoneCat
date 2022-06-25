@@ -1,4 +1,4 @@
-package main
+package gonecat
 
 import (
 	"bufio"
@@ -66,33 +66,6 @@ func (gc *GoneCat) resolveAddress() {
 	}
 
 	gc.Address = &net.TCPAddr{IP: ip, Port: port, Zone: ""}
-}
-
-func (gc *GoneCat) tcpListen() error {
-	listener, err := net.Listen(gc.Network, gc.Address.String())
-	if err != nil {
-		return err
-	}
-	defer listener.Close()
-
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			return err
-		}
-
-		go gc.handleConnection(conn)
-	}
-}
-
-func (gc *GoneCat) tcpConnect() error {
-	conn, err := net.Dial(gc.Network, gc.Address.String())
-	if err != nil {
-		return err
-	}
-
-	gc.handleConnection(conn)
-	return nil
 }
 
 func (gc *GoneCat) handleConnection(conn net.Conn) {
