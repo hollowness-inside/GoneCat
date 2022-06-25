@@ -16,7 +16,7 @@ func help() {
 }
 
 func main() {
-	gct := gonecat.GoneCat{}
+	gct := gonecat.GoneCatArguments{}
 	gct.UseDefaults()
 
 	info, err := os.Stdin.Stat()
@@ -62,8 +62,13 @@ func main() {
 		arg++
 	}
 
-	err = gct.Execute()
+	gonecat := gonecat.GetCat(gct)
+	if gonecat == nil {
+		panic("an error occured on trying to run gonecat")
+	}
+
+	err = gonecat.Execute()
 	if err != nil {
-		fmt.Printf("err: %v\n", err)
+		panic(err)
 	}
 }

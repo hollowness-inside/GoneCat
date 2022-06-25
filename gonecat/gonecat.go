@@ -1,15 +1,26 @@
 package gonecat
 
 import (
-	"errors"
 	"net"
 	"strconv"
 )
 
-type GoneCat struct {
+type GCCon struct {
+	net.Conn
+}
+
+type GoneCat interface {
+	Execute() error
+	listen() error
+	connect() error
+	handle(conn *GCCon)
+	streamPipe(conn *GCCon)
+	streamStdin(conn *GCCon)
+}
+
+type GoneCatArguments struct {
 	AddrStr    string
 	AddrPort   string
-	Address    *net.TCPAddr
 	Network    string
 	Listening  bool
 	IPVersion  uint8
@@ -18,10 +29,9 @@ type GoneCat struct {
 	ReadStdin  bool
 	ReadPipe   bool
 	BufferSize int
-	Addr       net.TCPAddr
 }
 
-func (gc *GoneCat) UseDefaults() {
+func (gc *GoneCatArguments) UseDefaults() {
 	gc.Listening = false
 	gc.IPVersion = 0
 	gc.Protocol = "tcp"
@@ -31,36 +41,21 @@ func (gc *GoneCat) UseDefaults() {
 	gc.BufferSize = 1024
 }
 
-func (gc *GoneCat) Execute() error {
+func GetCat(gc GoneCatArguments) GoneCat {
 	gc.resolveAddress()
 
-	if gc.Listening {
-		return gc.doListen()
-	}
-	return gc.doConnect()
-}
+	addr := gc.resolveAddress()
 
-func (gc *GoneCat) doListen() error {
 	if gc.Protocol == "tcp" {
-		return gc.tcpListen()
+		return TcpCat{gc, addr.(*net.TCPAddr)}
 	} else if gc.Protocol == "udp" {
-		return gc.udpListen()
+		return UdpCat{gc, addr.(*net.UDPAddr)}
 	}
 
-	return errors.New("cannot listen: no protocol provided")
+	return nil
 }
 
-func (gc *GoneCat) doConnect() error {
-	if gc.Protocol == "tcp" {
-		return gc.tcpConnect()
-	} else if gc.Protocol == "udp" {
-		return gc.udpConnect()
-	}
-
-	return errors.New("cannot connect: no protocol provided")
-}
-
-func (gc *GoneCat) resolveAddress() {
+func (gc *GoneCatArguments) resolveAddress() net.Addr {
 	var version string = ""
 	switch gc.IPVersion {
 	case 4:
@@ -77,5 +72,11 @@ func (gc *GoneCat) resolveAddress() {
 		panic("The given port is not a number")
 	}
 
-	gc.Address = &net.TCPAddr{IP: ip, Port: port, Zone: ""}
+	if gc.Protocol == "tcp" {
+		return &net.TCPAddr{IP: ip, Port: port, Zone: ""}
+	} else if gc.Protocol == "udp" {
+		return &net.UDPAddr{IP: ip, Port: port, Zone: ""}
+	} else {
+		return nil
+	}
 }
