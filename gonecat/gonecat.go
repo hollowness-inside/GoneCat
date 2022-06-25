@@ -1,12 +1,8 @@
 package gonecat
 
 import (
-	"bufio"
 	"errors"
-	"fmt"
-	"io"
 	"net"
-	"os"
 	"strconv"
 )
 
@@ -38,11 +34,27 @@ func (gc *GoneCat) UseDefaults() {
 func (gc *GoneCat) Execute() error {
 	gc.resolveAddress()
 
+	if gc.Listening {
+		return gc.doListen()
+	}
+	return gc.doConnect()
+}
+
+func (gc *GoneCat) doListen() error {
 	if gc.Protocol == "tcp" {
-		if gc.Listening {
-			return gc.tcpListen()
-		}
+		return gc.tcpListen()
+	} else if gc.Protocol == "udp" {
+		return gc.udpListen()
+	}
+
+	return errors.New("cannot listen: no protocol provided")
+}
+
+func (gc *GoneCat) doConnect() error {
+	if gc.Protocol == "tcp" {
 		return gc.tcpConnect()
+	} else if gc.Protocol == "udp" {
+		return gc.udpConnect()
 	}
 
 	return errors.New("cannot connect: no protocol provided")
@@ -66,43 +78,4 @@ func (gc *GoneCat) resolveAddress() {
 	}
 
 	gc.Address = &net.TCPAddr{IP: ip, Port: port, Zone: ""}
-}
-
-func (gc *GoneCat) handleConnection(conn net.Conn) {
-	defer conn.Close()
-
-	if gc.ReadPipe {
-		go gc.streamPipe(conn)
-	}
-
-	if gc.ReadStdin {
-		go gc.streamStdin(conn)
-	}
-
-	io.Copy(os.Stdout, conn)
-}
-
-func (gc *GoneCat) streamPipe(conn net.Conn) {
-	for {
-		_, err := io.CopyN(conn, os.Stdin, int64(gc.BufferSize))
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func (gc *GoneCat) streamStdin(conn net.Conn) {
-	scanner := bufio.NewScanner(os.Stdin)
-
-	for scanner.Scan() {
-		str := scanner.Text()
-
-		if gc.SendCRLF {
-			fmt.Fprintln(conn, str)
-		} else {
-			conn.Write([]byte(str))
-		}
-	}
 }
