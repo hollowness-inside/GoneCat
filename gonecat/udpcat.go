@@ -45,7 +45,7 @@ func (uc UdpCat) connect() error {
 
 func (uc UdpCat) handle(conn *GCCon) {
 	if uc.ReadPipe {
-		go uc.streamPipe(conn)
+		uc.streamPipe(conn)
 	}
 
 	if !uc.Listening && uc.ReadStdin {

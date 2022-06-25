@@ -52,7 +52,7 @@ func (tc TcpCat) handle(conn *GCCon) {
 	defer conn.Close()
 
 	if tc.ReadPipe {
-		go tc.streamPipe(conn)
+		tc.streamPipe(conn)
 	}
 
 	if tc.ReadStdin {
