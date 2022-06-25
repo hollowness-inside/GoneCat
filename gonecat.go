@@ -108,32 +108,37 @@ func (gc *GoneCat) handleConnection(conn net.Conn) {
 	defer conn.Close()
 
 	if gc.ReadPipe {
-		for {
-			_, err := io.CopyN(conn, os.Stdin, int64(gc.BufferSize))
-			if err == io.EOF {
-				break
-			} else if err != nil {
-				panic(err)
-			}
-		}
+		go gc.streamPipe(conn)
 	}
 
 	if gc.ReadStdin {
-		go func() {
-			scanner := bufio.NewScanner(os.Stdin)
-
-			for scanner.Scan() {
-				str := scanner.Text()
-
-				if gc.SendCRLF {
-					fmt.Fprintln(conn, str)
-				} else {
-					conn.Write([]byte(str))
-				}
-			}
-		}()
+		go gc.streamStdin(conn)
 	}
 
 	io.Copy(os.Stdout, conn)
+}
 
+func (gc *GoneCat) streamPipe(conn net.Conn) {
+	for {
+		_, err := io.CopyN(conn, os.Stdin, int64(gc.BufferSize))
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func (gc *GoneCat) streamStdin(conn net.Conn) {
+	scanner := bufio.NewScanner(os.Stdin)
+
+	for scanner.Scan() {
+		str := scanner.Text()
+
+		if gc.SendCRLF {
+			fmt.Fprintln(conn, str)
+		} else {
+			conn.Write([]byte(str))
+		}
+	}
 }
