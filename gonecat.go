@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -16,7 +17,7 @@ type GoneCat struct {
 	Network    string
 	Listening  bool
 	IPVersion  uint8
-	Tcp        bool
+	Protocol   string
 	SendCRLF   bool
 	ReadStdin  bool
 	ReadPipe   bool
@@ -27,7 +28,7 @@ type GoneCat struct {
 func (gc *GoneCat) UseDefaults() {
 	gc.Listening = false
 	gc.IPVersion = 0
-	gc.Tcp = true
+	gc.Protocol = "tcp"
 	gc.SendCRLF = false
 	gc.ReadStdin = true
 	gc.ReadPipe = false
@@ -37,13 +38,14 @@ func (gc *GoneCat) UseDefaults() {
 func (gc *GoneCat) Execute() error {
 	gc.resolveAddress()
 
-	if gc.Listening {
-		if gc.Tcp {
+	if gc.Protocol == "tcp" {
+		if gc.Listening {
 			return gc.tcpListen()
 		}
+		return gc.tcpConnect()
 	}
 
-	return gc.doConnect()
+	return errors.New("cannot connect: no protocol provided")
 }
 
 func (gc *GoneCat) resolveAddress() {
@@ -55,7 +57,7 @@ func (gc *GoneCat) resolveAddress() {
 		version = "6"
 	}
 
-	gc.Network = "tcp" + version
+	gc.Network = gc.Protocol + version
 
 	ip := net.ParseIP(gc.AddrStr)
 	port, err := strconv.Atoi(gc.AddrPort)
@@ -83,7 +85,7 @@ func (gc *GoneCat) tcpListen() error {
 	}
 }
 
-func (gc *GoneCat) doConnect() error {
+func (gc *GoneCat) tcpConnect() error {
 	conn, err := net.Dial(gc.Network, gc.Address.String())
 	if err != nil {
 		return err

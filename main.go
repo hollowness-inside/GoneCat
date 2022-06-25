@@ -11,7 +11,6 @@ func help() {
 	fmt.Println("\t-6 - Use IPv6")
 	fmt.Println("\t-C - Send CRLF as line-ending")
 	fmt.Println("\t-d - Detach from stdin")
-	fmt.Println("\t-u - UDP mode")
 }
 
 func main() {
@@ -36,8 +35,6 @@ func main() {
 			gct.IPVersion = 4
 		case "-6":
 			gct.IPVersion = 6
-		case "-u":
-			gct.Tcp = false
 		case "-C":
 			gct.SendCRLF = true
 		case "-l":
