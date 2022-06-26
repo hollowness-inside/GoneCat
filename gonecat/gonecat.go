@@ -45,13 +45,15 @@ func (gc *GoneCatArguments) UseDefaults() {
 func GetCat(gc *GoneCatArguments) GoneCat {
 	addr := gc.resolveAddress()
 
-	if gc.Protocol == "tcp" {
+	switch gc.Protocol {
+	case "tcp":
 		return TcpCat{gc, addr.(*net.TCPAddr)}
-	} else if gc.Protocol == "udp" {
+	case "udp":
 		return UdpCat{gc, addr.(*net.UDPAddr)}
+	default:
+		log.Fatalf("Wrong protocol name %s", gc.Protocol)
+		return nil
 	}
-
-	return nil
 }
 
 func (gc *GoneCatArguments) resolveAddress() net.Addr {
