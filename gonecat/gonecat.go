@@ -41,9 +41,7 @@ func (gc *GoneCatArguments) UseDefaults() {
 	gc.BufferSize = 1024
 }
 
-func GetCat(gc GoneCatArguments) GoneCat {
-	gc.resolveAddress()
-
+func GetCat(gc *GoneCatArguments) GoneCat {
 	addr := gc.resolveAddress()
 
 	if gc.Protocol == "tcp" {

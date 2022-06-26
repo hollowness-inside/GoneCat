@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func help() {
+func ShowHelp() {
 	fmt.Println("Use: gnc [options] address port")
 	fmt.Println("\t-4 - Use IPv4")
 	fmt.Println("\t-6 - Use IPv6")
@@ -16,23 +16,36 @@ func help() {
 }
 
 func main() {
-	gct := gonecat.GoneCatArguments{}
-	gct.UseDefaults()
+	gct := ParseArguments()
+	if gct == nil {
+		ShowHelp()
+		return
+	}
 
-	info, err := os.Stdin.Stat()
+	gonecat := gonecat.GetCat(gct)
+	if gonecat == nil {
+		panic("an error occured on trying to get gonecat")
+	}
+
+	err := gonecat.Execute()
 	if err != nil {
 		panic(err)
 	}
+}
 
-	if info.Mode()&os.ModeCharDevice == 0 {
-		gct.ReadPipe = true
+func ParseArguments() *gonecat.GoneCatArguments {
+	if len(os.Args) == 1 {
+		return nil
 	}
 
-	arg := 1
+	gct := new(gonecat.GoneCatArguments)
+	gct.UseDefaults()
 
-	for arg < len(os.Args) {
-		cur := os.Args[arg]
-		switch cur {
+	i := 1
+	for i < len(os.Args) {
+		arg := os.Args[i]
+
+		switch arg {
 		case "-4":
 			gct.IPVersion = "4"
 		case "-6":
@@ -46,29 +59,34 @@ func main() {
 		case "-d":
 			gct.ReadStdin = false
 		case "-h", "--help":
-			help()
-			return
+			return nil
 		default:
-			if arg+1 >= len(os.Args) {
-				help()
-				return
+			if i+1 >= len(os.Args) {
+				return nil
 			}
 
-			gct.AddrStr = cur
-			gct.AddrPort = os.Args[arg+1]
-			arg += 1
+			gct.AddrStr = arg
+			gct.AddrPort = os.Args[i+1]
+			i += 1
 		}
 
-		arg++
+		i += 1
 	}
 
-	gonecat := gonecat.GetCat(gct)
-	if gonecat == nil {
-		panic("an error occured on trying to run gonecat")
+	if gct.AddrStr == "" || gct.AddrPort == "" {
+		return nil
 	}
 
-	err = gonecat.Execute()
+	gct.ReadPipe = isPipeConnected()
+
+	return gct
+}
+
+func isPipeConnected() bool {
+	info, err := os.Stdin.Stat()
 	if err != nil {
 		panic(err)
 	}
+
+	return info.Mode()&os.ModeCharDevice == 0
 }
