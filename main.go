@@ -24,10 +24,6 @@ func main() {
 	}
 
 	gonecat := gonecat.GetCat(gct)
-	if gonecat == nil {
-		log.Fatal("an error occured on trying to get gonecat")
-	}
-
 	err := gonecat.Execute()
 	if err != nil {
 		log.Fatal(err)
@@ -88,6 +84,8 @@ func isPipeConnected() bool {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	println(info.Mode()&os.ModeCharDevice == 0)
 
 	return info.Mode()&os.ModeCharDevice == 0
 }
