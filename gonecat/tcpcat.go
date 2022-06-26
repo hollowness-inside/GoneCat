@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"os"
 )
@@ -68,7 +69,7 @@ func (tc TcpCat) streamPipe(conn *GCCon) {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 	}
 }

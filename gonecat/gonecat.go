@@ -1,6 +1,7 @@
 package gonecat
 
 import (
+	"log"
 	"net"
 	"strconv"
 )
@@ -59,7 +60,7 @@ func (gc *GoneCatArguments) resolveAddress() net.Addr {
 	ip := net.ParseIP(gc.AddrStr)
 	port, err := strconv.Atoi(gc.AddrPort)
 	if err != nil {
-		panic("The given port is not a number")
+		log.Fatal("The given port is not a number")
 	}
 
 	if gc.Protocol == "tcp" {

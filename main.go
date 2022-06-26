@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"joshua/green/gonecat/gonecat"
+	"log"
 	"os"
 )
 
@@ -24,12 +25,12 @@ func main() {
 
 	gonecat := gonecat.GetCat(gct)
 	if gonecat == nil {
-		panic("an error occured on trying to get gonecat")
+		log.Fatal("an error occured on trying to get gonecat")
 	}
 
 	err := gonecat.Execute()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
 
@@ -85,7 +86,7 @@ func ParseArguments() *gonecat.GoneCatArguments {
 func isPipeConnected() bool {
 	info, err := os.Stdin.Stat()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	return info.Mode()&os.ModeCharDevice == 0

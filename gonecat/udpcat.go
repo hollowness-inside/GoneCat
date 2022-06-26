@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"os"
 )
@@ -62,7 +63,7 @@ func (uc UdpCat) streamPipe(conn *GCCon) {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		conn.Write(buffer)
