@@ -19,7 +19,7 @@ type GoneCat interface {
 	streamStdin(conn *GCCon)
 }
 
-type GoneCatArguments struct {
+type GCArguments struct {
 	AddrStr    string
 	AddrPort   string
 	Network    string
@@ -32,7 +32,7 @@ type GoneCatArguments struct {
 	BufferSize int
 }
 
-func (gc *GoneCatArguments) UseDefaults() {
+func (gc *GCArguments) UseDefaults() {
 	gc.Listening = false
 	gc.IPVersion = ""
 	gc.Protocol = "tcp"
@@ -42,7 +42,7 @@ func (gc *GoneCatArguments) UseDefaults() {
 	gc.BufferSize = 1024
 }
 
-func GetCat(gc *GoneCatArguments) GoneCat {
+func GetCat(gc *GCArguments) GoneCat {
 	addr := gc.resolveAddress()
 
 	switch gc.Protocol {
@@ -56,7 +56,7 @@ func GetCat(gc *GoneCatArguments) GoneCat {
 	}
 }
 
-func (gc *GoneCatArguments) resolveAddress() net.Addr {
+func (gc *GCArguments) resolveAddress() net.Addr {
 	gc.Network = gc.Protocol + gc.IPVersion
 
 	ip := net.ParseIP(gc.AddrStr)

@@ -30,12 +30,12 @@ func main() {
 	}
 }
 
-func ParseArguments() *gonecat.GoneCatArguments {
+func ParseArguments() *gonecat.GCArguments {
 	if len(os.Args) == 1 {
 		return nil
 	}
 
-	gct := new(gonecat.GoneCatArguments)
+	gct := new(gonecat.GCArguments)
 	gct.UseDefaults()
 
 	i := 1
@@ -84,8 +84,6 @@ func isPipeConnected() bool {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	println(info.Mode()&os.ModeCharDevice == 0)
 
 	return info.Mode()&os.ModeCharDevice == 0
 }

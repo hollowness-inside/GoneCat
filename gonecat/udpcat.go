@@ -10,7 +10,7 @@ import (
 )
 
 type UdpCat struct {
-	*GoneCatArguments
+	*GCArguments
 	Address *net.UDPAddr
 }
 

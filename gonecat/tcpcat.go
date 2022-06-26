@@ -10,7 +10,7 @@ import (
 )
 
 type TcpCat struct {
-	*GoneCatArguments
+	*GCArguments
 	Address *net.TCPAddr
 }
 
