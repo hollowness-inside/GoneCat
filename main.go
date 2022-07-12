@@ -9,11 +9,11 @@ import (
 
 func ShowHelp() {
 	fmt.Println("Use: gnc [options] address port")
-	fmt.Println("\t-4 - Use IPv4")
-	fmt.Println("\t-6 - Use IPv6")
-	fmt.Println("\t-C - Do not send CRLF as line-ending")
-	fmt.Println("\t-d - Detach from stdin")
-	fmt.Println("\t-u - Use UDP")
+	fmt.Println("\t-4\tUse IPv4")
+	fmt.Println("\t-6\tUse IPv6")
+	fmt.Println("\t-C\tDo not send CRLF as line-ending")
+	fmt.Println("\t-d\tDetach from stdin")
+	fmt.Println("\t-u\tUse UDP")
 }
 
 func main() {
