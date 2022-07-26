@@ -45,6 +45,8 @@ func (uc *UdpCat) connect() error {
 }
 
 func (uc *UdpCat) handle(conn *GCCon) {
+	defer uc.Output.Close()
+
 	if uc.ReadPipe {
 		uc.streamPipe(conn)
 	}
@@ -53,7 +55,6 @@ func (uc *UdpCat) handle(conn *GCCon) {
 		go uc.streamStdin(conn)
 	}
 
-	defer uc.Output.Close()
 	io.Copy(uc.Output, conn)
 }
 

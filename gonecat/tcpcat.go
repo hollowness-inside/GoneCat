@@ -51,6 +51,7 @@ func (tc *TcpCat) connect() error {
 
 func (tc *TcpCat) handle(conn *GCCon) {
 	defer conn.Close()
+	defer tc.Output.Close()
 
 	if tc.ReadPipe {
 		tc.streamPipe(conn)
@@ -60,7 +61,6 @@ func (tc *TcpCat) handle(conn *GCCon) {
 		go tc.streamStdin(conn)
 	}
 
-	defer tc.Output.Close()
 	io.Copy(tc.Output, conn)
 }
 
