@@ -15,7 +15,7 @@ const HelpMsg = `Usage: gnc [options] address port
 	-d		Detach from stdin
 	-h		This help text
 	-I length	TCP receive buffer length
-	-l		Listen
+	-l		Listen mode
 	-o file		Redirect output to file	
 	-u		UDP mode
 `
