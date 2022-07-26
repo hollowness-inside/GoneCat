@@ -85,10 +85,10 @@ func ParseArguments() *gonecat.GCArguments {
 
 			gct.AddrStr = arg
 			gct.AddrPort = os.Args[i+1]
-			i += 1
+			i++
 		}
 
-		i += 1
+		i++
 	}
 
 	if gct.AddrStr == "" || gct.AddrPort == "" {
