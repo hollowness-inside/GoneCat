@@ -5,6 +5,7 @@ import (
 	"joshua/green/gonecat/gonecat"
 	"log"
 	"os"
+	"strconv"
 )
 
 const HelpMsg = `Usage: gnc [options] address port
@@ -13,6 +14,7 @@ const HelpMsg = `Usage: gnc [options] address port
 	-C	Do not send CRLF as line-ending
 	-d	Detach from stdin
 	-h	This help text
+	-I length	TCP receive buffer length
 	-l	Listen
 	-o file	Redirect output to file	
 	-u	UDP mode
@@ -51,6 +53,18 @@ func ParseArguments() *gonecat.GCArguments {
 			gct.IPVersion = "6"
 		case "-C":
 			gct.SendCRLF = false
+		case "-d":
+			gct.ReadStdin = false
+		case "-h", "--help":
+			return nil
+		case "-I":
+			i++
+			bsize, err := strconv.Atoi(os.Args[i])
+			if err != nil {
+				return nil
+			}
+
+			gct.BufferSize = bsize
 		case "-u":
 			gct.Protocol = "udp"
 		case "-l":
@@ -64,10 +78,6 @@ func ParseArguments() *gonecat.GCArguments {
 			}
 
 			gct.Output = output
-		case "-d":
-			gct.ReadStdin = false
-		case "-h", "--help":
-			return nil
 		default:
 			if i+1 >= len(os.Args) {
 				return nil
