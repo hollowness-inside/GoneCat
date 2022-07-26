@@ -12,6 +12,7 @@ const HelpMsg = `Usage: gnc [options] address port
 	-6	Use IPv6
 	-C	Do not send CRLF as line-ending
 	-d	Detach from stdin
+	-l	Listen
 	-o file	Redirect output to file
 	-u	Use UDP
 `
