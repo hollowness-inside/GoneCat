@@ -10,15 +10,6 @@ type GCCon struct {
 	net.Conn
 }
 
-type GoneCat interface {
-	Execute() error
-	listen() error
-	connect() error
-	handle(conn *GCCon)
-	streamPipe(conn *GCCon)
-	streamStdin(conn *GCCon)
-}
-
 type GCArguments struct {
 	AddrStr    string
 	AddrPort   string
@@ -30,6 +21,15 @@ type GCArguments struct {
 	ReadStdin  bool
 	ReadPipe   bool
 	BufferSize int
+}
+
+type GoneCat interface {
+	Execute() error
+	listen() error
+	connect() error
+	handle(conn *GCCon)
+	streamPipe(conn *GCCon)
+	streamStdin(conn *GCCon)
 }
 
 func (gc *GCArguments) UseDefaults() {
