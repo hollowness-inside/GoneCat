@@ -27,7 +27,6 @@ func (uc *UdpCat) listen() error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
 
 	uc.handle(&GCCon{conn})
 	return nil
@@ -38,13 +37,13 @@ func (uc *UdpCat) connect() error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
 
 	uc.handle(&GCCon{conn})
 	return nil
 }
 
 func (uc *UdpCat) handle(conn *GCCon) {
+	defer conn.Close()
 	defer uc.Output.Close()
 
 	if uc.ReadPipe {
