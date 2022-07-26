@@ -7,19 +7,18 @@ import (
 	"os"
 )
 
-func ShowHelp() {
-	fmt.Println("Use: gnc [options] address port")
-	fmt.Println("\t-4\tUse IPv4")
-	fmt.Println("\t-6\tUse IPv6")
-	fmt.Println("\t-C\tDo not send CRLF as line-ending")
-	fmt.Println("\t-d\tDetach from stdin")
-	fmt.Println("\t-u\tUse UDP")
-}
+const HelpMsg = `Usage: gnc [options] address port
+	-4	Use IPv4
+	-6	Use IPv6
+	-C	Do not send CRLF as line-ending
+	-d	Detach from stdin
+	-u	Use UDP
+`
 
 func main() {
 	gct := ParseArguments()
 	if gct == nil {
-		ShowHelp()
+		fmt.Println(HelpMsg)
 		return
 	}
 
