@@ -12,6 +12,7 @@ const HelpMsg = `Usage: gnc [options] address port
 	-6	Use IPv6
 	-C	Do not send CRLF as line-ending
 	-d	Detach from stdin
+	-o file	Redirect output to file
 	-u	Use UDP
 `
 
@@ -52,6 +53,15 @@ func ParseArguments() *gonecat.GCArguments {
 			gct.Protocol = "udp"
 		case "-l":
 			gct.Listening = true
+		case "-o":
+			i++
+			path := os.Args[i]
+			output, err := os.Create(path)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			gct.Output = output
 		case "-d":
 			gct.ReadStdin = false
 		case "-h", "--help":

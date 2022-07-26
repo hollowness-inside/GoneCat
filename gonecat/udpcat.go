@@ -53,7 +53,8 @@ func (uc *UdpCat) handle(conn *GCCon) {
 		go uc.streamStdin(conn)
 	}
 
-	io.Copy(os.Stdout, conn)
+	defer uc.Output.Close()
+	io.Copy(uc.Output, conn)
 }
 
 func (uc *UdpCat) streamPipe(conn *GCCon) {

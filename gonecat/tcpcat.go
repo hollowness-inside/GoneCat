@@ -60,7 +60,8 @@ func (tc *TcpCat) handle(conn *GCCon) {
 		go tc.streamStdin(conn)
 	}
 
-	io.Copy(os.Stdout, conn)
+	defer tc.Output.Close()
+	io.Copy(tc.Output, conn)
 }
 
 func (tc *TcpCat) streamPipe(conn *GCCon) {

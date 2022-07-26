@@ -1,13 +1,24 @@
 package gonecat
 
 import (
+	"io"
 	"log"
 	"net"
+	"os"
 	"strconv"
 )
 
 type GCCon struct {
 	net.Conn
+}
+
+type GoneCat interface {
+	Execute() error
+	listen() error
+	connect() error
+	handle(conn *GCCon)
+	streamPipe(conn *GCCon)
+	streamStdin(conn *GCCon)
 }
 
 type GCArguments struct {
@@ -21,15 +32,7 @@ type GCArguments struct {
 	ReadStdin  bool
 	ReadPipe   bool
 	BufferSize int
-}
-
-type GoneCat interface {
-	Execute() error
-	listen() error
-	connect() error
-	handle(conn *GCCon)
-	streamPipe(conn *GCCon)
-	streamStdin(conn *GCCon)
+	Output     io.WriteCloser
 }
 
 func (gc *GCArguments) UseDefaults() {
@@ -40,6 +43,7 @@ func (gc *GCArguments) UseDefaults() {
 	gc.ReadStdin = true
 	gc.ReadPipe = false
 	gc.BufferSize = 1024
+	gc.Output = os.Stdout
 }
 
 func GetCat(gc *GCArguments) GoneCat {
