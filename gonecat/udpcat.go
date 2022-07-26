@@ -14,7 +14,7 @@ type UdpCat struct {
 	Address *net.UDPAddr
 }
 
-func (uc UdpCat) Execute() error {
+func (uc *UdpCat) Execute() error {
 	if uc.Listening {
 		return uc.listen()
 	}
@@ -22,7 +22,7 @@ func (uc UdpCat) Execute() error {
 	return uc.connect()
 }
 
-func (uc UdpCat) listen() error {
+func (uc *UdpCat) listen() error {
 	conn, err := net.ListenUDP(uc.Network, uc.Address)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (uc UdpCat) listen() error {
 	return nil
 }
 
-func (uc UdpCat) connect() error {
+func (uc *UdpCat) connect() error {
 	conn, err := net.DialUDP(uc.Network, nil, (*net.UDPAddr)(uc.Address))
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (uc UdpCat) connect() error {
 	return nil
 }
 
-func (uc UdpCat) handle(conn *GCCon) {
+func (uc *UdpCat) handle(conn *GCCon) {
 	if uc.ReadPipe {
 		uc.streamPipe(conn)
 	}
@@ -56,7 +56,7 @@ func (uc UdpCat) handle(conn *GCCon) {
 	io.Copy(os.Stdout, conn)
 }
 
-func (uc UdpCat) streamPipe(conn *GCCon) {
+func (uc *UdpCat) streamPipe(conn *GCCon) {
 	for {
 		buffer := make([]byte, uc.BufferSize)
 		_, err := os.Stdin.Read(buffer)
@@ -70,7 +70,7 @@ func (uc UdpCat) streamPipe(conn *GCCon) {
 	}
 }
 
-func (uc UdpCat) streamStdin(conn *GCCon) {
+func (uc *UdpCat) streamStdin(conn *GCCon) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() {

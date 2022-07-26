@@ -14,7 +14,7 @@ type TcpCat struct {
 	Address *net.TCPAddr
 }
 
-func (tc TcpCat) Execute() error {
+func (tc *TcpCat) Execute() error {
 	if tc.Listening {
 		return tc.listen()
 	}
@@ -22,7 +22,7 @@ func (tc TcpCat) Execute() error {
 	return tc.connect()
 }
 
-func (tc TcpCat) listen() error {
+func (tc *TcpCat) listen() error {
 	listener, err := net.ListenTCP(tc.Network, tc.Address)
 	if err != nil {
 		return err
@@ -39,7 +39,7 @@ func (tc TcpCat) listen() error {
 	}
 }
 
-func (tc TcpCat) connect() error {
+func (tc *TcpCat) connect() error {
 	conn, err := net.DialTCP(tc.Network, nil, tc.Address)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (tc TcpCat) connect() error {
 	return nil
 }
 
-func (tc TcpCat) handle(conn *GCCon) {
+func (tc *TcpCat) handle(conn *GCCon) {
 	defer conn.Close()
 
 	if tc.ReadPipe {
@@ -63,7 +63,7 @@ func (tc TcpCat) handle(conn *GCCon) {
 	io.Copy(os.Stdout, conn)
 }
 
-func (tc TcpCat) streamPipe(conn *GCCon) {
+func (tc *TcpCat) streamPipe(conn *GCCon) {
 	for {
 		_, err := io.CopyN(conn, os.Stdin, int64(tc.BufferSize))
 		if err == io.EOF {
@@ -74,7 +74,7 @@ func (tc TcpCat) streamPipe(conn *GCCon) {
 	}
 }
 
-func (tc TcpCat) streamStdin(conn *GCCon) {
+func (tc *TcpCat) streamStdin(conn *GCCon) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() {

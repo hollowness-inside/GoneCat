@@ -47,9 +47,9 @@ func GetCat(gc *GCArguments) GoneCat {
 
 	switch gc.Protocol {
 	case "tcp":
-		return TcpCat{gc, addr.(*net.TCPAddr)}
+		return &TcpCat{gc, addr.(*net.TCPAddr)}
 	case "udp":
-		return UdpCat{gc, addr.(*net.UDPAddr)}
+		return &UdpCat{gc, addr.(*net.UDPAddr)}
 	default:
 		log.Fatalf("Wrong protocol name %s", gc.Protocol)
 		return nil
