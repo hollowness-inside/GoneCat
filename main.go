@@ -9,15 +9,15 @@ import (
 )
 
 const HelpMsg = `Usage: gnc [options] address port
-	-4	Use IPv4
-	-6	Use IPv6
-	-C	Do not send CRLF as line-ending
-	-d	Detach from stdin
-	-h	This help text
+	-4		Use IPv4
+	-6		Use IPv6
+	-C		Do not send CRLF as line-ending
+	-d		Detach from stdin
+	-h		This help text
 	-I length	TCP receive buffer length
-	-l	Listen
-	-o file	Redirect output to file	
-	-u	UDP mode
+	-l		Listen
+	-o file		Redirect output to file	
+	-u		UDP mode
 `
 
 func main() {
