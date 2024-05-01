@@ -34,6 +34,8 @@ func main() {
 	}
 }
 
+// ParseArguments parses the command line arguments and returns a GCArguments
+// object. If the command line arguments are invalid, nil is returned.
 func ParseArguments() *gonecat.GCArguments {
 	if len(os.Args) == 1 {
 		return nil
@@ -100,6 +102,7 @@ func ParseArguments() *gonecat.GCArguments {
 	return gct
 }
 
+// isPipeConnected returns true if stdin is connected to a pipe
 func isPipeConnected() bool {
 	info, err := os.Stdin.Stat()
 	if err != nil {

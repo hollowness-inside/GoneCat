@@ -9,11 +9,13 @@ import (
 	"os"
 )
 
+// UdpCat is a struct that holds the arguments for the UDP cat command
 type UdpCat struct {
 	*GCArguments
 	Address *net.UDPAddr
 }
 
+// Execute runs the UDP client/server.
 func (uc *UdpCat) Execute() error {
 	if uc.Listening {
 		return uc.listen()
@@ -22,6 +24,7 @@ func (uc *UdpCat) Execute() error {
 	return uc.connect()
 }
 
+// listen listens for incoming connections and handles them.
 func (uc *UdpCat) listen() error {
 	conn, err := net.ListenUDP(uc.Network, uc.Address)
 	if err != nil {
@@ -32,6 +35,7 @@ func (uc *UdpCat) listen() error {
 	return nil
 }
 
+// connect connects to the server and handles the connection.
 func (uc *UdpCat) connect() error {
 	conn, err := net.DialUDP(uc.Network, nil, (*net.UDPAddr)(uc.Address))
 	if err != nil {
@@ -42,6 +46,7 @@ func (uc *UdpCat) connect() error {
 	return nil
 }
 
+// handle handles the connection.
 func (uc *UdpCat) handle(conn *GCCon) {
 	defer conn.Close()
 	defer uc.Output.Close()
@@ -57,6 +62,7 @@ func (uc *UdpCat) handle(conn *GCCon) {
 	io.Copy(uc.Output, conn)
 }
 
+// streamPipe streams the pipe to the connection.
 func (uc *UdpCat) streamPipe(conn *GCCon) {
 	for {
 		buffer := make([]byte, uc.BufferSize)
@@ -71,6 +77,7 @@ func (uc *UdpCat) streamPipe(conn *GCCon) {
 	}
 }
 
+// streamStdin streams stdin to the connection.
 func (uc *UdpCat) streamStdin(conn *GCCon) {
 	scanner := bufio.NewScanner(os.Stdin)
 
